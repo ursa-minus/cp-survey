@@ -1,0 +1,28 @@
+name: Survey Check
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  survey_check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Update Check Run Status
+      uses: actions/github-script@v7 
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const conclusion = 'failure';
+          const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+          await octokit.rest.checks.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            name: 'Survey Check',
+            head_sha: context.sha,
+            status: 'in-progress',
+            output: {
+              title: 'Survey Check',
+              summary: 'Survey completion check',
+            }
+          });
