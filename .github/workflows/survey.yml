@@ -24,7 +24,7 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: "Copilot survey completion for PR",
-            body: "Please complete the survey",
+            body: "Please complete the survey"
           });
           console.log(issue.data.number)
     - name: Set Issue Number
