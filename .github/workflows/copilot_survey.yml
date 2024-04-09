@@ -1,0 +1,93 @@
+name: Initiate Copilot survey for PR
+
+on:
+  pull_request:
+    types:
+      - opened
+  issues:
+    types:
+      - closed
+
+jobs:
+  create_and_check_survey: 
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Issue
+      uses: actions/github-script@v7
+      id: set-issue
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          console.log(context.repo.owner)
+          console.log(context.repo.repo)
+          const issue = await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: "Copilot survey completion for PR #${{ github.event.pull_request.number }}",
+            body: "Please complete the survey by responding to this issue with: \n\n- [ ] I used GitHub Copilot for my work\n- [ ] I did not use GitHub Copilot for my work \n\nOnce you have completed the survey, please close the issue."
+          });
+          core.exportVariable('ISSUE_NUMBER', issue.data.number);
+    - name: PR opens; create status check, issue, PR comment
+      run: echo "{ISSUE_NUMBER}={$ISSUE_NUMBER}" >> "$GITHUB_ENV"
+    - name: Comment on PR
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          if (github.event_name == 'pull_request' && github.event.action == 'opened' ) {
+            const survey_status = await octokit.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Survey Check',
+              head_sha: context.sha,
+              status: 'failure',
+              output: {
+                title: 'Survey Check',
+                summary: 'Survey completion check',
+              }
+            });
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "Copilot survey completion for PR #${{ github.event.pull_request.number }}",
+              body: "Please complete the survey by responding to this issue with: \n\n- [ ] I used GitHub Copilot for my work\n- [ ] I did not use GitHub Copilot for my work \n\nOnce you have completed the survey, please close the issue.\nCheck run ID: ${survey_status.data.check_run_id}, Repo: ${context.repo.repo}`"
+            });
+            core.exportVariable('ISSUE_NUMBER', issue.data.number);
+
+            await octokit.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ISSUE_NUMBER,
+              body: `Heads up @${{github.event.pull_request.user.login}}, please complete the survey found in https://github.com/${{ github.repository }}/issues/${{ env.ISSUE_NUMBER }} before merging this PR."
+           });
+          
+    - name: Survey Check
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          if (github.event_name == 'issues' && github.event.action == 'closed' ) {
+            const survey_issue = await octokit.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: process.env.ISSUE_NUMBER
+            });
+
+            const checkRunId = survey_issue.data.body.match(/Check run ID: (\d+),/)[1];
+            console.log(checkRunId);
+            const repo = (/Repo: ([\w-]+\/[\w-]+)/)[1];
+            console.log(repo);
+
+            await octokit.rest.checks.update({
+            owner: repo.split('/')[0],
+            repo: repo.split('/')[1],
+            check_run_id: checkRunId,
+            status: 'completed',
+            conclusion: 'success',
+            output: {
+              title: 'Survey Check',
+              summary: 'Survey completion check',
+            }
+          });
+
