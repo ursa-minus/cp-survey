@@ -73,6 +73,8 @@ jobs:
               repo: context.repo.repo,
               issue_number: process.env.ISSUE_NUMBER
             });
+            console.log(⭐️ survey issue is: )
+            console.log(survey_issue.data);
 
             const checkRunId = survey_issue.data.body.match(/Check run ID: (\d+),/)[1];
             console.log(checkRunId);
