@@ -28,7 +28,7 @@ jobs:
           });
           core.exportVariable('ISSUE_NUMBER', issue.data.number);
     - name: Set Issue Number
-      run: echo "ISSUE_NUMBER" >> $GITHUB_ENV
+      run: echo "{ISSUE_NUMBER}" >> $GITHUB_ENV
     - name: Comment on PR
       uses: actions/github-script@v7
       with:
