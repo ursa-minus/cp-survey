@@ -23,7 +23,7 @@ jobs:
             repo: context.repo.repo,
             title: "Copilot survey completion for PR",
             body: "Please complete the survey",
-            assignees: [context.payload.pull_request.user.login]
+            assignees: "apdarr"
           });
           return issue
     - name: Set Issue Number
