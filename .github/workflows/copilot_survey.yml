@@ -63,7 +63,7 @@ jobs:
 
             const checkRunId = survey_issue.data.body.match(/Check run ID: (\d+),/)[1];
             console.log(checkRunId);
-            const repo = (/Repo: ([\w-]+\/[\w-]+)/)[1];
+            const repo = survey_issue.data.body.match(/Repo: ([\w-]+\/[\w-]+)/)[1]; // Added match function call here
             console.log(repo);
 
             await octokit.rest.checks.update({
