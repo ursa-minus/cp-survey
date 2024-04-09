@@ -12,23 +12,6 @@ jobs:
   create_and_check_survey: 
     runs-on: ubuntu-latest
     steps:
-    - name: Create Issue
-      uses: actions/github-script@v7
-      id: set-issue
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          console.log(context.repo.owner)
-          console.log(context.repo.repo)
-          const issue = await github.rest.issues.create({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            title: "Copilot survey completion for PR #${{ github.event.pull_request.number }}",
-            body: "Please complete the survey by responding to this issue with: \n\n- [ ] I used GitHub Copilot for my work\n- [ ] I did not use GitHub Copilot for my work \n\nOnce you have completed the survey, please close the issue."
-          });
-          core.exportVariable('ISSUE_NUMBER', issue.data.number);
-    - name: PR opens; create status check, issue, PR comment
-      run: echo "{ISSUE_NUMBER}={$ISSUE_NUMBER}" >> "$GITHUB_ENV"
     - name: Comment on PR
       uses: actions/github-script@v7
       with:
@@ -51,7 +34,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: "Copilot survey completion for PR #${{ github.event.pull_request.number }}",
-              body: "Please complete the survey by responding to this issue with: \n\n- [ ] I used GitHub Copilot for my work\n- [ ] I did not use GitHub Copilot for my work \n\nOnce you have completed the survey, please close the issue.\nCheck run ID: ${survey_status.data.check_run_id}, Repo: ${context.repo.repo}`"
+              body: "Please complete the survey by responding to this issue with: \n\n- [ ] I used GitHub Copilot for my work\n- [ ] I did not use GitHub Copilot for my work \n\nOnce you have completed the survey, please close the issue.\nCheck run ID: ${survey_status.data.check_run_id}, Repo: ${context.repo.repo}"
             });
             core.exportVariable('ISSUE_NUMBER', issue.data.number);
 
@@ -59,8 +42,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: ISSUE_NUMBER,
-              body: `Heads up @${{github.event.pull_request.user.login}}, please complete the survey found in https://github.com/${{ github.repository }}/issues/${{ env.ISSUE_NUMBER }} before merging this PR."
-           });
+              body: "Heads up @${{github.event.pull_request.user.login}}, please complete the survey found in https://github.com/${{ github.repository }}/issues/${{ env.ISSUE_NUMBER }} before merging this PR."
+            });
           
     - name: Survey Check
       uses: actions/github-script@v7
