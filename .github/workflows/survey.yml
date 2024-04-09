@@ -4,9 +4,6 @@ on:
   pull_request:
     types:
       - opened
-  push:
-    branches:
-      - main
 
 jobs:
   create_survey_issue: 
@@ -39,7 +36,7 @@ jobs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: "Heads up ${context.event.pull_request.user.login}, please complete the survey found in #${{ env.ISSUE_NUMBER }} before merging this PR."
+            body: "Heads up @${context.event.pull_request.user.login}, please complete the survey found in #${{ env.ISSUE_NUMBER }} before merging this PR."
           });
   survey_check:
     runs-on: ubuntu-latest
