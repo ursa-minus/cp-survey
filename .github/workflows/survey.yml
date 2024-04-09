@@ -26,10 +26,14 @@ jobs:
             title: "Copilot survey completion for PR",
             body: "Please complete the survey"
           });
-          console.log(issue.data.number)
+          core.exportVariable('ISSUE_NUMBER', issue.data.number);
+    - name: Set Issue Number
+      run: echo "ISSUE_NUMBER" >> $GITHUB_ENV
   survey_check:
     runs-on: ubuntu-latest
     steps:
+    - name: Check env var
+      run: echo $ISSUE_NUMBER
     - name: Update Check Run Status
       uses: actions/github-script@v7 
       with:
