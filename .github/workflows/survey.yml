@@ -33,11 +33,12 @@ jobs:
       uses: actions/github-script@v7
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        # In the GitHub API, PRs and issues are the same thing. Below, we're creating a comment on the PR so the reference to "issue" overlaps
         script: |
-          await github.rest.pulls.createComment({
+          const pull_comment = await github.rest.issues.createComment({
+            issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            pull_number: context.event.pull_request.number,
             body: "Heads up ${context.event.pull_request.user.login}, please complete the survey found in #${{ env.ISSUE_NUMBER }} before merging this PR."
           });
   survey_check:
