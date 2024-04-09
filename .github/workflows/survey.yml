@@ -21,8 +21,8 @@ jobs:
           const issue = await github.issues.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            title: 'Copilot survey completion for PR",
-            body: 'Please complete the survey',
+            title: "Copilot survey completion for PR",
+            body: "Please complete the survey",
             assignees: [context.payload.pull_request.user.login]
           });
           return issue
