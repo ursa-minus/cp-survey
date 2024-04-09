@@ -36,7 +36,7 @@ jobs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: "Heads up @${context.event.pull_request.user.login}, please complete the survey found in #${{ env.ISSUE_NUMBER }} before merging this PR."
+            body: "Heads up @{{github.event.pull_request.user.login}}, please complete the survey found in https://github.com/${{ context.repo.owner }}/${{ context.repo.repo }}/#${{ env.ISSUE_NUMBER }} before merging this PR."
           });
   survey_check:
     runs-on: ubuntu-latest
