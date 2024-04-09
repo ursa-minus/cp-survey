@@ -27,8 +27,6 @@ jobs:
             body: "Please complete the survey"
           });
           console.log(issue.data.number)
-    - name: Set Issue Number
-      run: echo "ISSUE_NUMBER=${{ steps.create_issue.outputs.result }}" >> $GITHUB_ENV
   survey_check:
     runs-on: ubuntu-latest
     steps:
